@@ -27,13 +27,15 @@ class CompleteMe
   
   def find_suggestions(node)
     suggestions = []
-    node_links = node.links.keys
+    if node != nil
+      node_links = node.links.keys 
 
-    node_links.each do |letter|
-      suggestions << letter if node.link_to(letter).terminator
-        
-      find_suggestions(node.link_to(letter)).each do |element|
-          suggestions << letter + element
+      node_links.each do |letter|
+        suggestions << letter if node.link_to(letter).terminator
+          
+        find_suggestions(node.link_to(letter)).each do |element|
+            suggestions << letter + element
+        end
       end
     end
     suggestions
@@ -51,14 +53,16 @@ class CompleteMe
   end
 
   def node_finder(fragment, node = @root_node)
-    length = fragment.length
-    characters = fragment.chars
-    letter = characters.delete_at(0)
+    if node.includes_link?(fragment[0])
+      length = fragment.length
+      characters = fragment.chars
+      letter = characters.delete_at(0)
 
-    if length == 1
-      node.link_to(letter)
-    else
-      node_finder(characters.join, node.link_to(letter))
+      if length == 1
+        node.link_to(letter)
+      else
+        node_finder(characters.join, node.link_to(letter))
+      end
     end
   end
 
