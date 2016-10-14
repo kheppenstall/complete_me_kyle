@@ -122,6 +122,12 @@ class CompleteMeTest < Minitest::Test
     assert_equal ['massive','massif'] , suggestion
   end
 
+  def test_it_populates_huge_file
+    completion = CompleteMe.new
+    completion.populate('./test/words.txt')
+    assert_equal 235886, completion.count
+  end
+
   def test_it_populates_huge_number_of_words_and_makes_suggestions
     completion = CompleteMe.new
     completion.populate('./test/words.txt')
