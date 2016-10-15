@@ -2,12 +2,14 @@ class Node
 
   attr_reader :letter,
               :links,
-              :terminator
+              :terminator,
+              :selects
 
   def initialize(letter = "")
     @letter = letter
     @links = Hash.new
     @terminator = false
+    @selects = 0
   end
 
   def insert_link(letter)
@@ -38,5 +40,10 @@ class Node
   def delete_key(letter)
     @links.delete(letter)
   end
+
+  def select
+    @selects += 1
+  end
+
 
 end

@@ -85,6 +85,15 @@ class NodeTest < Minitest::Test
     assert_equal({}, node.links)
   end
 
+  def test_0_selects_by_default
+    node = Node.new('p')
+    assert_equal 0, node.selects
+  end
 
+  def test_select_increments_selects_by_1
+    node = Node.new('p')
+    node.select
+    assert_equal 1, node.selects
+  end
   
 end

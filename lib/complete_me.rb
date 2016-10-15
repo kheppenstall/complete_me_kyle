@@ -49,7 +49,7 @@ class CompleteMe
       second_halves = find_suggestions(node)
       suggestions = second_halves.map {|second_half| fragment + second_half}
     end
-    suggestions
+    sort_by_selections(suggestions)
   end
 
   def search(length, letter, characters, node)
@@ -80,7 +80,7 @@ class CompleteMe
     end
   end
 
-  def delete_nodes(word, previous_letter = "")
+  def delete_nodes(word,previous_letter = "")
     node = node_finder(word)
     characters = word.chars
     letter = characters.delete_at(-1)
@@ -101,6 +101,19 @@ class CompleteMe
   def delete(word)
     node = node_finder(word)
     remove_terminator_and_delete(node, word) if node != nil
+  end
+
+  def select(fragment, word)
+    node = node_finder(word)
+    if suggest(fragment).include?(word)
+      node.select if node != nil
+    end
+  end
+
+  def sort_by_selections(words)
+    suggestions = words.sort_by do |word|
+      node_finder(word).selects * -1
+    end
   end
 
 end
