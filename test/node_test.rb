@@ -56,5 +56,35 @@ class NodeTest < Minitest::Test
     node.make_terminator
     assert_equal true, node.terminator
   end
+
+  def test_delete_removes_terminator
+    node = Node.new('a')
+    node.remove_terminator
+    assert_equal false, node.remove_terminator
+  end
+
+  def test_disappear_removes_links
+    node = Node.new('p')
+    node.links['i'] = Node.new('i')
+    node.disappear 
+    assert_equal({}, node.links)
+  end
+
+  def test_delete_key_removes_key
+    node = Node.new('p')
+    node.links['i'] = Node.new('i')
+    node.links['e'] = Node.new('e')
+    node.delete_key('i')
+    assert_equal 1, node.links.length
+  end
+
+  def test_delete_key_removes_only_key
+    node = Node.new('p')
+    node.links['i'] = Node.new('i')
+    node.delete_key('i')
+    assert_equal({}, node.links)
+  end
+
+
   
 end

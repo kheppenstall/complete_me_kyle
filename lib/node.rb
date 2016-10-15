@@ -4,7 +4,7 @@ class Node
               :links,
               :terminator
 
-  def initialize(letter = 'root')
+  def initialize(letter = "")
     @letter = letter
     @links = Hash.new
     @terminator = false
@@ -24,6 +24,19 @@ class Node
 
   def make_terminator
     @terminator = true
+  end
+
+  def remove_terminator
+    @terminator = false
+  end
+
+  def disappear
+    @letter = nil
+    @links = {}
+  end
+
+  def delete_key(letter)
+    @links.delete(letter)
   end
 
 end

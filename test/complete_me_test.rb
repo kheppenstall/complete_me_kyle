@@ -9,9 +9,9 @@ class CompleteMeTest < Minitest::Test
     assert CompleteMe.new
   end
 
-  def test_complete_mes_initialize_with_a_root_node
+  def test_complete_mes_initialize_with_a_root_node_with_no_letter
     completion = CompleteMe.new
-    assert_equal "root", completion.root_node.letter
+    assert_equal "", completion.root_node.letter
   end
 
   def test_it_inserts_the_word_pizza
@@ -61,6 +61,12 @@ class CompleteMeTest < Minitest::Test
     completion.insert('pizza')
     result = completion.node_finder('piz').letter
     assert_equal 'z', result
+  end
+
+  def test_it_can_find_root_node
+    completion = CompleteMe.new
+    node = completion.node_finder("")
+    assert_equal completion.root_node, node
   end
 
   def test_it_suggests_an_from_a
@@ -122,30 +128,101 @@ class CompleteMeTest < Minitest::Test
     assert_equal ['massive','massif'] , suggestion
   end
 
-  # def test_it_populates_huge_file
-  #   completion = CompleteMe.new
-  #   completion.populate('./test/words.txt')
-  #   assert_equal 235886, completion.count
-  # end
+  def test_it_populates_huge_file
+    completion = CompleteMe.new
+    completion.populate('./test/words.txt')
+    assert_equal 235886, completion.count
+  end
 
-  # def test_it_populates_huge_number_of_words_and_makes_suggestions
-  #   completion = CompleteMe.new
-  #   completion.populate('./test/words.txt')
-  #   suggestion = completion.suggest('aar')
-  #   assert_equal ["aardvark", "aardwolf"], suggestion
-  # end
+  def test_it_populates_huge_number_of_words_and_makes_suggestions
+    completion = CompleteMe.new
+    completion.populate('./test/words.txt')
+    suggestion = completion.suggest('aar')
+    assert_equal ["aardvark", "aardwolf"], suggestion
+  end
 
   def test_it_suggests_nil_when_no_words_are_there
     completion = CompleteMe.new
     suggestion = completion.suggest('a')
-    assert_equal nil, suggestion
+    assert_equal [], suggestion
   end
 
   def test_it_suggests_nil_given_crazy_fragment
     completion = CompleteMe.new
     completion.populate('./test/simple_words.txt')
     suggestion = completion.suggest('zzzzzzzz')
-    assert_equal nil, suggestion
+    assert_equal [], suggestion
   end
+
+  def test_it_deletes_nothing_when_nothing_exists
+    completion = CompleteMe.new
+    refute completion.delete("")
+  end
+
+  def test_it_deletes_anything_when_nothing_exists
+    completion = CompleteMe.new
+    refute completion.delete("pizza")
+  end
+
+  def test_it_deletes_nothing_when_something_exists
+    completion = CompleteMe.new
+    completion.insert('pizza')
+    refute completion.delete("")
+  end
+
+  def test_delete_removes_terminator
+    completion = CompleteMe.new
+    completion.insert('pizza')
+    completion.delete('pizza')
+    suggestion = completion.suggest('piz')
+    assert_equal [], suggestion
+  end
+  
+  def test_delete_removes_terminator_with_populated_list
+    completion = CompleteMe.new
+    completion.populate('./test/simple_words.txt')
+    completion.delete('pizza')
+    suggestion = completion.suggest('piz')
+    assert_equal ["pizzaz", "pizzeria"] , suggestion
+  end
+
+  def test_delete_then_insert_puts_word_back
+    completion = CompleteMe.new
+    completion.populate('./test/simple_words.txt')
+    completion.delete('pizza')
+    completion.insert('pizza')
+    suggestion = completion.suggest('piz')
+    assert_equal ["pizza","pizzaz", "pizzeria"] , suggestion
+  end
+
+  def test_it_deletes_nodes
+    completion = CompleteMe.new
+    completion.insert('pi')
+    completion.delete('pi')
+    result = completion.root_node.includes_link?('p')
+    assert_equal false, result
+  end
+
+  def test_it_deletes_nodes_all_the_way_to_root
+    completion = CompleteMe.new
+    completion.insert('pizza')
+    completion.insert('pets')
+    completion.delete('pizza')
+    result = completion.root_node.link_to('p').includes_link?('i')
+    assert_equal false, result
+  end
+
+  def test_it_deletes_only_necessary_nodes
+    completion = CompleteMe.new
+    completion.insert('pizza')
+    completion.insert('pets')
+    completion.insert('pie')
+    completion.delete('pizza')
+    result_true = completion.root_node.link_to('p').link_to('i').includes_link?('e')
+    result_false = completion.root_node.link_to('p').link_to('i').includes_link?('z')
+    assert_equal true, result_true
+    assert_equal false, result_false
+  end
+  
 
 end
