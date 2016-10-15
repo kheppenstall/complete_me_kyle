@@ -70,7 +70,7 @@ class CompleteMe
 
   def populate(dictionary)
     words_array = dictionary.split("\n")
-    words_array.each {|word| insert(word.gsub(/\n/, ""))}
+    words_array.each {|word| insert(word)}
   end
 
   def vanish_node(node, characters, letter)
