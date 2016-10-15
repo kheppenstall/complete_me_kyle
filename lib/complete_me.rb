@@ -12,11 +12,12 @@ class CompleteMe
   end
 
   def add_other_letters(length, letter, characters, node)
+    next_node = node.link_to(letter)
     if length == 1
-      @count += 1
-      node.link_to(letter).make_terminator
+      @count += 1 unless next_node.terminator
+      next_node.make_terminator
     else
-      insert(characters.join, node.link_to(letter))
+      insert(characters.join, next_node)
     end
   end
 
@@ -67,12 +68,12 @@ class CompleteMe
     search(length, letter, characters, node) if node.includes_link?(letter)
   end
 
-  def populate(file)
-    words = File.readlines(file)
-    words.each {|word| insert(word.gsub(/\n/, ""))}
+  def populate(dictionary)
+    words_array = dictionary.split("\n")
+    words_array.each {|word| insert(word.gsub(/\n/, ""))}
   end
 
-  def vanish_nodes(node, characters, letter)
+  def vanish_node(node, characters, letter)
     if node != @root_node && node.links.length == 0
       node.disappear
       delete_nodes(characters.join, letter)
@@ -85,16 +86,21 @@ class CompleteMe
     letter = characters.delete_at(-1)
     if node != nil
       node.delete_key(previous_letter)
-      vanish_nodes(node, characters, letter)
+      vanish_node(node, characters, letter)
+    end
+  end
+
+  def remove_terminator_and_delete(node, word)
+    if node.terminator
+      node.remove_terminator 
+      delete_nodes(word) if node.links.length == 0
+      @count -= 1
     end
   end
 
   def delete(word)
-    terminator_node = node_finder(word)
-    if terminator_node != nil
-      terminator_node.remove_terminator 
-      delete_nodes(word) if terminator_node.links.length == 0
-    end
+    node = node_finder(word)
+    remove_terminator_and_delete(node, word) if node != nil
   end
 
 end
