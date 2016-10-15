@@ -30,7 +30,7 @@ class CompleteMe
   def populate_suggestions(letter, node, suggestions)
     next_node = node.link_to(letter)
     suggestions << letter if next_node.terminator
-    find_suggestions(next_node).each {|element| suggestions << letter + element}
+    find_suggestions(next_node).each {|suggestion| suggestions << letter + suggestion}
   end
   
   def find_suggestions(node)
@@ -44,7 +44,7 @@ class CompleteMe
     node = node_finder(fragment)
     if node!= nil
       second_halves = find_suggestions(node)
-      suggestions = second_halves.map {|half| fragment + half}
+      suggestions = second_halves.map {|second_half| fragment + second_half}
     end
   end
 
